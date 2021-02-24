@@ -6,18 +6,18 @@ defmodule HangManGame do
   end
 
   def play(grid, word) do
-    IO.puts("=== HANG GAME ===")
-    guest_struct = %HangMan.Guest{}
-    while(guest_struct.attempts, grid, word, guest_struct)
+    IO.puts("=== HANGMAN GAME ===")
+    guess_struct = %HangMan.Guess{}
+    while(guess_struct.attempts, grid, word, guess_struct)
   end
 
-  def while(0, _grid, _word, _guest_struct), do: :ok
+  def while(0, _grid, _word, _guess_struct), do: :ok
 
-  def while(ats, grid, word, guest_struct) do
-    IO.puts("Word to guest: #{word}")
+  def while(ats, grid, word, guess_struct) do
+    # IO.puts("Word to guess: #{word}")
     IO.puts("Attempts: #{ats}")
 
-    %HangMan.Guest{guest_word: gw, attempts: ats} = guest_struct
+    %HangMan.Guess{guess_word: gw, attempts: ats} = guess_struct
 
     gw =
       if gw == nil do
@@ -27,43 +27,43 @@ defmodule HangManGame do
         gw
       end
 
-    IO.puts("GW: #{gw}")
+    # IO.puts("GW: #{gw}")
 
-    option = IO.gets("Enter a letter (0 to exit): ") |> String.trim()
+    option = IO.gets("Enter a letter: ") |> String.trim()
 
-    guest_result =
+    guess_result =
       word
       |> String.split("", trim: true)
       |> Enum.map(fn x -> validate_letter(x, option) end)
 
-    IO.puts("GUEST: #{guest_result}")
+    # IO.puts("GUESS: #{guess_result}")
 
-    guest_or_not =
-      guest_result
+    guess_or_not =
+      guess_result
       |> Enum.all?(fn x -> x == "_" end)
 
-    IO.puts("Guest_or_Not: #{guest_or_not}")
+    # IO.puts("Guess_or_Not: #{guess_or_not}")
 
-    guest_result =
-      if not guest_or_not do
-        guest_result
+    guess_result =
+      if not guess_or_not do
+        guess_result
         |> update_result(gw)
       else
         gw
       end
 
-    IO.puts("guest_result: #{guest_result}")
+    # IO.puts("guess_result: #{guess_result}")
 
-    guest_struct = %HangMan.Guest{guest_struct | guest_word: guest_result}
+    guess_struct = %HangMan.Guess{guess_struct | guess_word: guess_result}
 
-    IO.inspect(guest_struct)
+    IO.inspect(guess_struct)
 
     paint_hangman(ats, grid)
 
     ats = ats - 1
-    guest_struct = %HangMan.Guest{guest_struct | attempts: ats}
+    guess_struct = %HangMan.Guess{guess_struct | attempts: ats}
 
-    while(guest_struct.attempts, grid, word, guest_struct)
+    while(guess_struct.attempts, grid, word, guess_struct)
   end
 
   def validate_letter(letter, option) do
@@ -90,7 +90,7 @@ defmodule HangManGame do
   def paint_hangman(ats, grid) do
     case ats do
       6 ->
-        ManageGrid.paint_grid(grid)
+        ManageGrid.head(grid) |> ManageGrid.paint_grid()
 
       5 ->
         ManageGrid.head(grid) |> ManageGrid.paint_grid()
