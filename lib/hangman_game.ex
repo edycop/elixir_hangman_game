@@ -58,12 +58,29 @@ defmodule HangManGame do
 
     IO.inspect(guess_struct)
 
+    ats =
+      if guess_or_not do
+        ats - 1
+      else
+        ats
+      end
+
     paint_hangman(ats, grid)
 
-    ats = ats - 1
     guess_struct = %HangMan.Guess{guess_struct | attempts: ats}
 
-    while(guess_struct.attempts, grid, word, guess_struct)
+    incomplete =
+      guess_result
+      |> Enum.any?(fn x -> x == "_" end)
+
+    ats =
+      if not incomplete do
+        0
+      else
+        guess_struct.attempts
+      end
+
+    while(ats, grid, word, guess_struct)
   end
 
   def validate_letter(letter, option) do
@@ -90,7 +107,7 @@ defmodule HangManGame do
   def paint_hangman(ats, grid) do
     case ats do
       6 ->
-        ManageGrid.head(grid) |> ManageGrid.paint_grid()
+        grid |> ManageGrid.paint_grid()
 
       5 ->
         ManageGrid.head(grid) |> ManageGrid.paint_grid()
